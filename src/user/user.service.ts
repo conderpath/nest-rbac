@@ -1,41 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository, getConnection, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Role } from 'src/role/entities/role.entity';
 import { Menu } from 'src/menu/entities/menu.entity';
+import { LoginDto } from './dto/login-user.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly user: Repository<User>,
     @InjectRepository(Role) private readonly role: Repository<Role>,
+    private readonly authService: AuthService,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    const u = new User();
-    u.name = createUserDto.name;
-    u.email = createUserDto.email;
-    u.password = createUserDto.password;
-    return this.user.save(u);
-    return 'This action adds a new user';
-  }
-
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async login(loginDto: LoginDto) {
+    const { username, password } = loginDto;
+    const user = await this.user.findOne({
+      where: { name: username },
+      select: ['id', 'name', 'password'],
+    });
+    if (!user) {
+      throw new HttpException('用户不存在', 400);
+    }
+    if (user.password !== password) {
+      throw new HttpException('密码错误', 400);
+    }
+    const token = await this.authService.createJwt(user);
+    return token;
   }
   async bindRole(userId: number, roleIds: number[]) {
     const u = await this.user.findOne({

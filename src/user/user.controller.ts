@@ -7,39 +7,17 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { BindRoleDto, CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginDto } from './dto/login-user.dto';
+import { Skip } from 'src/common/skip.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get('detail')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
   @Post('bindRole')
   bindRole(@Body() bindRole: BindRoleDto) {
     return this.userService.bindRole(bindRole.userId, bindRole.roleIds);
@@ -51,5 +29,11 @@ export class UserController {
   @Get('menus')
   getMenus(@Query('userId') userId: number) {
     return this.userService.getMenus(userId);
+  }
+  // 不需要守卫
+  @Skip(true)
+  @Post('login')
+  login(@Body() loginDto: LoginDto) {
+    return this.userService.login(loginDto);
   }
 }
