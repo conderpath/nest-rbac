@@ -11,7 +11,7 @@ import { Reflector } from '@nestjs/core';
 import { Skip_KEY } from './skip.decorator';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthsGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector, // 用于获取装饰器中的元数据
@@ -22,6 +22,7 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (skip) return true;
+    console.log(99999999);
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {

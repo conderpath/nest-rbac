@@ -1,6 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -14,6 +18,8 @@ export class UserService {
   constructor(
     @InjectRepository(User) private readonly user: Repository<User>,
     @InjectRepository(Role) private readonly role: Repository<Role>,
+    // 解决user和auth之间循环依赖
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
   async login(loginDto: LoginDto) {
@@ -98,5 +104,14 @@ export class UserService {
       }
     }
     return list;
+  }
+  async validateUser(username, password) {
+    const user = await this.user.findOne({
+      where: {
+        name: username,
+        password: password,
+      },
+    });
+    return user;
   }
 }

@@ -8,9 +8,5 @@ export class LoginDto {
   })
   username: string;
   @IsNotEmpty({ message: '密码不能为空' })
-  @IsString({ message: '密码必须为字符串' })
-  @Matches(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,16})/, {
-    message: '密码必须由数字大小写字母组成',
-  })
   password: string;
 }

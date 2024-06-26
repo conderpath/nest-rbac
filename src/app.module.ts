@@ -24,6 +24,7 @@ import { APP_GUARD } from '@nestjs/core';
       retryDelay: 500,
       // 重连次数
       retryAttempts: 10,
+      // logging: true, // 打印sql日志
       // autoLoadEntities: true, //如果为true,将自动加载实体 forFeature()方法注册的每个实体都将自动添加到配置对象的实体数组中
     }),
     UserModule,
