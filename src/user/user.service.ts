@@ -12,6 +12,7 @@ import { Role } from 'src/role/entities/role.entity';
 import { Menu } from 'src/menu/entities/menu.entity';
 import { LoginDto } from './dto/login-user.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -80,6 +81,17 @@ export class UserService {
     // 转换成树形结构
     const menus = this.transArrTree(r.menus || []);
     return menus;
+  }
+  async register(user: CreateUserDto) {
+    const u = await this.user.findOne({
+      where: { name: user.name },
+    });
+    if (u) {
+      throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
+    }
+    const res = await this.user.save(user);
+    return null;
+    return await this.user.save(user);
   }
   transArrTree(arr: Menu[], pid = 0) {
     const list = [];

@@ -12,10 +12,12 @@ import {
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ unique: true })
   name: string;
   @Column()
   email: string;
+  @Column({ comment: '手机号', length: 11, nullable: true })
+  phone?: string;
   // 密码不返回
   @Column({ select: false })
   password: string;
@@ -42,5 +44,5 @@ export class User {
     // 自动会生成一张表
     name: 'user_role',
   })
-  roles: Role[];
+  roles?: Role[];
 }
