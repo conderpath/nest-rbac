@@ -6,6 +6,7 @@ import {
   JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
+  VirtualColumn,
 } from 'typeorm';
 
 @Entity()
@@ -45,4 +46,6 @@ export class User {
     name: 'user_role',
   })
   roles?: Role[];
+  @VirtualColumn({ query: () => null })
+  permissions: string[];
 }

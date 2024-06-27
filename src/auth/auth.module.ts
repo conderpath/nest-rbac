@@ -9,14 +9,24 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtGuard } from 'src/common/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { PermissionGuard } from 'src/common/permission.guard';
 @Module({
   imports: [
     PassportModule,
-    JwtModule.register({
-      global: true,
-      secret: config.jwt.secret, // 设置JWT的密钥
-      signOptions: { expiresIn: config.jwt.expires }, // 设置JWT的过期时间
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        global: true,
+        signOptions: { expiresIn: configService.get('JWT_EXPIRY') },
+      }),
+      inject: [ConfigService],
     }),
+    /* JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET, // 设置JWT的密钥
+      signOptions: { expiresIn: process.env.JWT_EXPIRY }, // 设置JWT的过期时间
+    }), */
     forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
@@ -27,6 +37,10 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
   exports: [AuthService], // 导出AuthService，以便在其他模块中使用

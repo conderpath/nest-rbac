@@ -4,9 +4,12 @@ import { HttpExceptionFilter } from './common/httpException.filter';
 import { GlobalResponse } from './common/response.interceptor';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useStaticAssets(join(__dirname, '..', 'public'), { prefix: '/' });
   // 全局异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter());
   // 全局响应拦截器
@@ -16,7 +19,7 @@ async function bootstrap() {
   // 注册全局管道
   app.useGlobalPipes(new ValidationPipe());
   initSwagger(app);
-  await app.listen(3000);
+  await app.listen(process.env.PORT);
 }
 
 function initSwagger(app) {
@@ -27,7 +30,10 @@ function initSwagger(app) {
     .addTag('API')
     .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('doc', app, document);
+  SwaggerModule.setup('doc', app, document, {
+    customCssUrl: '/theme.css',
+  });
 }
 bootstrap();

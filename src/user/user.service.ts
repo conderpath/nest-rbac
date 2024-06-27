@@ -78,9 +78,13 @@ export class UserService {
       where: { id: role.id },
       relations: ['menus'],
     });
+
+    return r.menus;
+  }
+  async getMenuTree(userId) {
+    const menus = await this.getMenus(userId);
     // 转换成树形结构
-    const menus = this.transArrTree(r.menus || []);
-    return menus;
+    return this.transArrTree(menus || []);
   }
   async register(user: CreateUserDto) {
     const u = await this.user.findOne({
@@ -91,7 +95,6 @@ export class UserService {
     }
     const res = await this.user.save(user);
     return null;
-    return await this.user.save(user);
   }
   transArrTree(arr: Menu[], pid = 0) {
     const list = [];
@@ -117,12 +120,22 @@ export class UserService {
     }
     return list;
   }
+  // 获取按钮权限
+  getPermission(arr) {
+    return arr.reduce((prev, next) => {
+      if (next.menuType === 3) {
+        prev.push(next.permission);
+      }
+      return prev;
+    }, []);
+  }
   async validateUser(username, password) {
     const user = await this.user.findOne({
       where: {
         name: username,
       },
-      select: ['id', 'name', 'password'],
+      relations: ['roles'],
+      select: ['id', 'name', 'password', 'roles'],
     });
     if (!user) {
       throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
@@ -130,6 +143,7 @@ export class UserService {
     if (user.password != password) {
       throw new HttpException('密码错误', HttpStatus.BAD_REQUEST);
     }
+    return user;
     return user;
   }
 }
