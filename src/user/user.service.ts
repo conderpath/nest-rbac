@@ -121,9 +121,15 @@ export class UserService {
     const user = await this.user.findOne({
       where: {
         name: username,
-        password: password,
       },
+      select: ['id', 'name', 'password'],
     });
+    if (!user) {
+      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
+    }
+    if (user.password != password) {
+      throw new HttpException('密码错误', HttpStatus.BAD_REQUEST);
+    }
     return user;
   }
 }

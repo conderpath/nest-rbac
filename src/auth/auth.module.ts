@@ -3,11 +3,12 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { config } from '../config';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthsGuard } from '../common/auths.guard';
 import { UserModule } from 'src/user/user.module';
 import { LocalStrategy } from './local.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './jwt.strategy';
+import { JwtGuard } from 'src/common/jwt.guard';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     PassportModule,
@@ -22,9 +23,10 @@ import { PassportModule } from '@nestjs/passport';
   providers: [
     AuthService,
     LocalStrategy,
+    JwtStrategy,
     {
       provide: APP_GUARD,
-      useClass: AuthsGuard,
+      useClass: JwtGuard,
     },
   ],
   exports: [AuthService], // 导出AuthService，以便在其他模块中使用

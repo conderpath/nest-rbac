@@ -6,7 +6,10 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UserService) {
-    super();
+    super({
+      usernameField: 'username', // 设置用户名的字段名
+      passwordField: 'password', // 设置密码的字段名
+    });
   }
 
   async validate(username: string, password: string): Promise<any> {

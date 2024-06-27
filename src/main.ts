@@ -25,6 +25,7 @@ function initSwagger(app) {
     .setDescription('API接口文档')
     .setVersion('1.0')
     .addTag('API')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, document);

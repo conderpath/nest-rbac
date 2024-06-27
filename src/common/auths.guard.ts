@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { config } from '../config';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { Skip_KEY } from './skip.decorator';
+import { SKIP_KEY } from './skip.decorator';
 
 @Injectable()
 export class AuthsGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class AuthsGuard implements CanActivate {
     private reflector: Reflector, // 用于获取装饰器中的元数据
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const skip = this.reflector.getAllAndOverride<boolean>(Skip_KEY, [
+    const skip = this.reflector.getAllAndOverride<boolean>(SKIP_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
